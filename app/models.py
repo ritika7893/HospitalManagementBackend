@@ -1,10 +1,11 @@
 from django.db import models
 import random
 
-def generate_unique_id(prefix):
+def generate_id(prefix):
     return f"{prefix}/{random.randint(10000, 99999)}"
 
 class AllLog(models.Model):
+    id = models.AutoField(primary_key=True)
     ROLE_CHOICES = [('patient', 'Patient'), ('doctor', 'Doctor'), ('admin', 'Admin')]
     unique_id = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
@@ -19,6 +20,7 @@ class AllLog(models.Model):
 
 
 class Patient(models.Model):
+    id = models.AutoField(primary_key=True)
     patient_id = models.CharField(max_length=50, unique=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
@@ -33,7 +35,7 @@ class Patient(models.Model):
     updated_byname = models.CharField(max_length=100, null=True, blank=True)
     def save(self, *args, **kwargs):
         if not self.unique_id:
-            self.unique_id = generate_unique_id("PAN")
+            self.unique_id = generate_id("PAN")
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -41,6 +43,7 @@ class Patient(models.Model):
 
 
 class Doctor(models.Model):
+    id = models.AutoField(primary_key=True)
     doctor_id = models.CharField(max_length=50, unique=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
@@ -54,7 +57,7 @@ class Doctor(models.Model):
     updated_byname = models.CharField(max_length=100, null=True, blank=True)
     def save(self, *args, **kwargs):
         if not self.doctor_id:
-            self.doctor_id = generate_unique_id("DOC")
+            self.doctor_id = generate_id("DOC")
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -62,6 +65,7 @@ class Doctor(models.Model):
 
 
 class Admin(models.Model):
+    id = models.AutoField(primary_key=True)
     admin_id = models.CharField(max_length=50, unique=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
@@ -75,7 +79,7 @@ class Admin(models.Model):
     updated_byname = models.CharField(max_length=100, null=True, blank=True)
     def save(self, *args, **kwargs):
         if not self.admin_id:
-            self.admin_id = generate_unique_id("ADM")
+            self.admin_id = generate_id("ADM")
         super().save(*args, **kwargs)
 
     def __str__(self):
