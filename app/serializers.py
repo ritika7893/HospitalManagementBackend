@@ -1,26 +1,9 @@
 from rest_framework import serializers
-from .models import Patient, Doctor, Admin
-
-class PatientSerializer(serializers.ModelSerializer):
-    
-
+from .models import AllUser
+class AllUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Patient
-        fields = '__all__'
-        read_only_fields = ['id', 'patient_id']
-
-class DoctorSerializer(serializers.ModelSerializer):
-   
-
-    class Meta:
-        model = Doctor
-        fields = '__all__'
-        read_only_fields = ['id', 'doctor_id']
-
-class AdminSerializer(serializers.ModelSerializer):
-    
-
-    class Meta:
-        model = Admin
-        fields = '__all__'
-        read_only_fields = ['id', 'admin_id']
+        model=AllUser
+        fields='__all__'
+class LoginSerializer(serializers.Serializer):
+    email_or_phone = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
