@@ -7,3 +7,6 @@ class AllUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email_or_phone = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
+class ForgetPasswordSerializer(serializers.Serializer):
+    email_or_phone = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

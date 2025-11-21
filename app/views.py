@@ -5,7 +5,7 @@ from rest_framework import status
 
 from app.authenticate import CustomJWTAuthentication
 from .models import AllUser
-from .serializers import AllUserSerializer, LoginSerializer
+from .serializers import AllUserSerializer, ForgetPasswordSerializer, LoginSerializer
 from .utils import generate_id
 from rest_framework.permissions import IsAuthenticated   # your function
 from django.contrib.auth.hashers import make_password,check_password
@@ -126,3 +126,28 @@ class RefreshTokenAPIView(APIView):
 
         except TokenError:
             return Response({"error": "Invalid or expired refresh token"}, status=401)
+
+class ChangePasswordAPIView(APIView):
+
+    def post(self, request):
+        serializer = ForgetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email_or_phone = serializer.validated_data["email_or_phone"]
+        new_password = serializer.validated_data["new_password"]
+
+        # Find user by email or phone
+        user = AllUser.objects.filter(email=email_or_phone).first() \
+            or AllUser.objects.filter(phone=email_or_phone).first()
+
+        if not user:
+            return Response({"error": "User not found"}, status=404)
+
+        # Set new password
+        user.password = make_password(new_password)
+        user.save()
+
+        return Response(
+            {"message": "Password reset successful"},
+            status=200
+        )
