@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from app.authenticate import CustomJWTAuthentication
-from .models import AllUser
-from .serializers import AllUserSerializer, ForgetPasswordSerializer, LoginSerializer
+from .models import AllUser, DoctorProfile, PatientProfile
+from .serializers import AllUserSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
 from .utils import generate_id
 from rest_framework.permissions import IsAuthenticated   # your function
 from django.contrib.auth.hashers import make_password,check_password
@@ -151,3 +151,47 @@ class ChangePasswordAPIView(APIView):
             {"message": "Password reset successful"},
             status=200
         )
+class CreateProfileAPIView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        user = request.user   # Comes from token
+
+        # --- Check Role ---
+        if user.role not in ["doctor", "patient"]:
+            return Response(
+                {"error": "Only doctor or patient can create a profile"},
+                status=403
+            )
+
+        # --- Doctor Profile ---
+        if user.role == "doctor":
+            
+            if DoctorProfile.objects.filter(user=user.user_id).exists():
+                return Response({"error": "Doctor profile already exists"}, status=400)
+
+            serializer = DoctorProfileSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user)   # Assign logged-in user
+                return Response(
+                    {"message": "Doctor profile created", "profile": serializer.data},
+                    status=201
+                )
+            return Response(serializer.errors, status=400)
+
+        # --- Patient Profile ---
+        if user.role == "patient":
+
+            if PatientProfile.objects.filter(user=user.user_id).exists():
+                return Response({"error": "Patient profile already exists"}, status=400)
+
+            serializer = PatientProfileSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user)
+                return Response(
+                    {"message": "Patient profile created", "profile": serializer.data},
+                    status=201
+                )
+            return Response(serializer.errors, status=400)
