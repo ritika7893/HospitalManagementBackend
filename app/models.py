@@ -1,4 +1,4 @@
-from queue import Full
+
 from django.db import models
 
 
@@ -10,6 +10,7 @@ class AllUser(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
+    fullname=models.CharField(max_length=80,default="test")
     user_id = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, unique=True)
@@ -46,9 +47,9 @@ class Department(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class DoctorProfile(models.Model):
-    fullname=models.CharField(max_length=80)
+   
     user = models.OneToOneField(AllUser, on_delete=models.CASCADE, to_field='user_id')
-    department=models.ForeignKey(Department,on_delete=models.CASCADE,default=Full)
+    department=models.ForeignKey(Department,on_delete=models.CASCADE)
     consulting_fee = models.DecimalField(max_digits=10, decimal_places=2)
     qualification = models.CharField(max_length=40)
     timing = models.TimeField()
@@ -59,7 +60,7 @@ class DoctorProfile(models.Model):
 
 
 class PatientProfile(models.Model):
-    fullname=models.CharField(max_length=80)
+   
     user = models.OneToOneField(AllUser, on_delete=models.CASCADE, to_field='user_id')
     age = models.PositiveIntegerField()
     address = models.TextField()

@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from app.authenticate import CustomJWTAuthentication
-from .models import AllUser, DoctorProfile, PatientProfile
-from .serializers import AllUserSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
+from .models import AllUser, Department, DoctorProfile, PatientProfile
+from .serializers import AllUserSerializer, DepartmentSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
 from .utils import generate_id
 from rest_framework.permissions import IsAuthenticated   # your function
 from django.contrib.auth.hashers import make_password,check_password
@@ -195,3 +195,33 @@ class CreateProfileAPIView(APIView):
                     status=201
                 )
             return Response(serializer.errors, status=400)
+class DepartmentListAPIView(APIView):
+    def post(self,request):
+        serializer=DepartmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"Department created successfully"},status=201)
+        return Response(serializer.errors,status=400)
+    def get(self,request):
+        departments=Department.objects.all()
+        serializer=DepartmentSerializer(departments,many=True)
+        return Response({"departments":serializer.data},status=200)
+    def delete(self,request):
+        id=request.data.get("id")
+        try:    
+            department=Department.objects.get(id=id)
+            department.delete()
+            return Response({"message":"Department deleted successfully"},status=200)   
+        except Department.DoesNotExist:
+            return Response({"error":"Department not found"},status=404)
+    def put(self,request):
+        id=request.data.get("id")
+        try:
+            department=Department.objects.get(id=id)
+        except Department.DoesNotExist:
+            return Response({"error":"Department not found"},status=404)
+        serializer=DepartmentSerializer(department,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"Department updated successfully"},status=200)
+        return Response(serializer.errors,status=400)
