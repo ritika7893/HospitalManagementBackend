@@ -35,3 +35,6 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "user": {"read_only": True}
         }
+class CombinedUserProfileSerializer(serializers.Serializer):
+    user = AllUserSerializer()
+    profile = serializers.DictField()

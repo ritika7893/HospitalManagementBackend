@@ -6,6 +6,6 @@ urlpatterns=[
    path('user-detail/',UserDetailAPIView.as_view(),name='user-detail'),
    path("token/refresh/", RefreshTokenAPIView.as_view(), name="token_refresh"),
    path("change-password/",ChangePasswordAPIView.as_view(),name="change_password"),
-   path("create-profile/",CreateProfileAPIView.as_view(),name='create-profile'),
+   path("profile/",CreateProfileAPIView.as_view(),name='create-profile'),
    path("department-list/",DepartmentListAPIView.as_view(),name='department-list')
 ]

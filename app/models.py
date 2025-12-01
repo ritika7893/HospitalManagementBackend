@@ -52,7 +52,8 @@ class DoctorProfile(models.Model):
     department=models.ForeignKey(Department,on_delete=models.CASCADE)
     consulting_fee = models.DecimalField(max_digits=10, decimal_places=2)
     qualification = models.CharField(max_length=40)
-    timing = models.TimeField()
+    start_timing = models.TimeField()
+    end_timing = models.TimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -60,7 +61,6 @@ class DoctorProfile(models.Model):
 
 
 class PatientProfile(models.Model):
-   
     user = models.OneToOneField(AllUser, on_delete=models.CASCADE, to_field='user_id')
     age = models.PositiveIntegerField()
     address = models.TextField()
