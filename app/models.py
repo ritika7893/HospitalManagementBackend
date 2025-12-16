@@ -10,7 +10,7 @@ class AllUser(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
-    fullname=models.CharField(max_length=80,default="test")
+    full_name=models.CharField(max_length=80,default="test")
     user_id = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, unique=True)
