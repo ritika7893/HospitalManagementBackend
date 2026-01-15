@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AllUser, Department, DoctorProfile, PatientProfile
+from .models import AllUser, Appointment, Department, DoctorProfile, PatientProfile
 
 
 class AllUserSerializer(serializers.ModelSerializer):
@@ -38,3 +38,8 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 class CombinedUserProfileSerializer(serializers.Serializer):
     user = AllUserSerializer()
     profile = serializers.DictField()
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Appointment
+        field='__all__'

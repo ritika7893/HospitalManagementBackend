@@ -1,6 +1,6 @@
 
 from django.db import models
-
+import random
 
 class AllUser(models.Model):
     ROLE_CHOICES = [
@@ -21,7 +21,8 @@ class AllUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     user_status = models.CharField(max_length=20, default='active')
     is_active = models.BooleanField(default=True)
-
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -71,3 +72,25 @@ class PatientProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Patient: {self.user.user_id}"
+
+class Appointment(models.Model):
+    STATUS_cHOICES=[
+        ('scheduled','Scheduled'),
+        ('completed','Completed'),
+        ('canceled','Canceled')
+    ]
+    appointment_id=models.CharField(max_length=50,unique=True)
+    patient=models.ForeignKey(AllUser,on_delete=models.CASCADE,to_field="user_id",related_name="patient_appointment")
+    doctor=models.ForeignKey(AllUser,on_delete=models.CASCADE,to_field="user_id",related_name="doctor_appointment")
+    appointment_date_time=models.DateTimeField()
+    appointment_status=models.CharField(max_length=20,default="scheduled")
+    reason=models.TextField()
+    created_at=models.DateTimeField(auto_now=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    def save(self,*args,**kwargs):
+        if not self.appointment_id:
+            appointment_id_prefix="APT-"
+            self.appointment_id=appointment_id_prefix+str(random.randint(100000,999999))
+
+    def __str__(self):
+        return self.appointment_id

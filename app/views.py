@@ -228,7 +228,7 @@ class CreateProfileAPIView(APIView):
     def put(self, request):
         user = request.user
 
-        # ❌ Do NOT allow to update these fields
+        
         blocked_fields = ["email", "phone", "role", "password", "user_id"]
 
         for field in blocked_fields:
@@ -238,14 +238,13 @@ class CreateProfileAPIView(APIView):
                     status=400
                 )
 
-        # Allow only fullname & gender update
         user_updatable = {}
         if "fullname" in request.data:
             user_updatable["fullname"] = request.data["fullname"]
         if "gender" in request.data:
             user_updatable["gender"] = request.data["gender"]
 
-        # Update user basic fields
+       
         if user_updatable:
             user_serializer = AllUserSerializer(user, data=user_updatable, partial=True)
             if user_serializer.is_valid():
@@ -253,7 +252,7 @@ class CreateProfileAPIView(APIView):
             else:
                 return Response(user_serializer.errors, status=400)
 
-        # --- Update profile based on role ---
+       
         if user.role == "doctor":
             try:
                 profile = DoctorProfile.objects.get(user=user.user_id)
