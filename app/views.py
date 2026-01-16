@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from app.authenticate import CustomJWTAuthentication
+from hospital.app.premissions import IsPatientUser
 from .models import AllUser, Department, DoctorProfile, PatientProfile
-from .serializers import AllUserSerializer, DepartmentSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
+from .serializers import AllUserSerializer, AppointmentSerializer, DepartmentSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
 from .utils import generate_id
 from rest_framework.permissions import IsAuthenticated   # your function
 from django.contrib.auth.hashers import make_password,check_password
@@ -310,4 +311,13 @@ class DepartmentListAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message":"Department updated successfully"},status=200)
+        return Response(serializer.errors,status=400)
+class AppointmentAPIView(APIView):
+    authentication_classes=[CustomJWTAuthentication]
+    permission_classes=[IsPatientUser]
+    def post(self,request):
+        serializer=AppointmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(patient=request.user)
+            return Response({"message":"Appointment created successfully"},status=201)
         return Response(serializer.errors,status=400)
