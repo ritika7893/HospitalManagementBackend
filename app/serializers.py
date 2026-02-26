@@ -42,4 +42,5 @@ class CombinedUserProfileSerializer(serializers.Serializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model=Appointment
-        field='__all__'
+        fields = '__all__'
+        read_only_fields = ["appointment_id","created_at","updated_at",]

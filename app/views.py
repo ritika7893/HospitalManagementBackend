@@ -2,12 +2,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.utils.dateparse import parse_datetime
 from app.authenticate import CustomJWTAuthentication
-from hospital.app.premissions import IsPatientUser
+from .premissions import IsPatientUser
 from .models import AllUser, Department, DoctorProfile, PatientProfile
 from .serializers import AllUserSerializer, AppointmentSerializer, DepartmentSerializer, DoctorProfileSerializer, ForgetPasswordSerializer, LoginSerializer, PatientProfileSerializer
 from .utils import generate_id
+from django.utils.dateparse import parse_datetime
 from rest_framework.permissions import IsAuthenticated   # your function
 from django.contrib.auth.hashers import make_password,check_password
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -316,8 +317,19 @@ class AppointmentAPIView(APIView):
     authentication_classes=[CustomJWTAuthentication]
     permission_classes=[IsPatientUser]
     def post(self,request):
+        doctor_id=request.data.get("doctor")
+        appointment_date_time=request.data.get("appointment_date_time")
+        try:
+            doctor=AllUser.objects.get(user_id=doctor_id)
+        except AllUser.DoesNotExist:
+            return Response({"error":"Doctor not found"},status=404) 
+        doctor_profile=DoctorProfile.objects.filter(user=doctor.user_id).first()
+        appointment_date_time=parse_datetime(appointment_date_time)
+        appointment_time=appointment_date_time.time()
+        if not(doctor_profile.start_timing <=appointment_time and appointment_time<=doctor_profile.end_timing):
+            return Response({"error":"Appointment time is outside doctor working hours"},status=400)
         serializer=AppointmentSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(patient=request.user)
+            serializer.save(patient=request.user,doctor=doctor,appointment_status="scheduled")
             return Response({"message":"Appointment created successfully"},status=201)
         return Response(serializer.errors,status=400)

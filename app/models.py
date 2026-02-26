@@ -1,7 +1,7 @@
 
 from django.db import models
 import random
-
+from django.db.models import Max
 class AllUser(models.Model):
     ROLE_CHOICES = [
         ('patient', 'Patient'),
@@ -89,8 +89,14 @@ class Appointment(models.Model):
     updated_at=models.DateTimeField(auto_now=True)
     def save(self,*args,**kwargs):
         if not self.appointment_id:
-            appointment_id_prefix="APT-"
-            self.appointment_id=appointment_id_prefix+str(random.randint(100000,999999))
-
+            last_id=Appointment.objects.aggregate(max_id=Max('appointment_id'))['max_id']
+            if last_id:
+                last_numeric_id=int(last_id.split("-")[1])
+                new_numeric_id=last_numeric_id+1
+            else:
+                new_numeric_id=1
+            self.appointment_id=f"APP-{new_numeric_id:05d}"
+        super().save(*args,**kwargs)
+         
     def __str__(self):
         return self.appointment_id
